@@ -1,5 +1,5 @@
 # Hacktoberfest spam killer
-Finds low effort pr's in a repo, assigns them the spam label and closes them.
+Finds low effort PR's in a repo, assigns them the spam label and closes them.
 
 # Why?
 [Hacktoberfest](https://hacktoberfest.digitalocean.com/) is a corporate-sponsored [distributed denial of service attack](https://github.com/search?p=5&q=is%3Apr+is%3Aclosed+label%3Aspam+created%3A%3E%3D2020-09-30&type=Issues) against the open source maintainer community.
