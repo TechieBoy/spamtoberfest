@@ -70,7 +70,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Lists potentially spam prs in github")
     parser.add_argument("--repo", "-r", required=True)
     repo = parser.parse_args().repo
-    # g = Github("dced527225c3b6d1dad9a074bae7f37be504c6be")
     g = Github(personal_token)
     try:
         repo = g.get_repo(repo)
