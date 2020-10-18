@@ -20,7 +20,22 @@ class bcolors:
     UNDERLINE = "\033[4m"
 
 
-def is_spam(pr):
+def is_spam(pr, include_user_stats = False):
+    # Penalize users created this year or only active in October generally
+    if include_user_stats:
+        if pr.user.created_at > datetime(year=2020, month=9, day=30):
+            return f"{bcolors.FAIL}{pr.user.login} too young{bcolors.ENDC}\n"
+
+        in_oct, not_oct = 0, 0
+        for event in pr.user.get_public_events()[:500]:
+            if event.created_at.month == 10:
+                in_oct += 1
+            else:
+                not_oct += 1
+
+        if not not_oct or (in_oct / not_oct) > 1.01:
+            return f"{bcolors.FAIL}{pr.user.login} hacktober-heavy activity{bcolors.ENDC}\n"
+           
     # Amazing machine learning(if statements) based spam detection lol
     num_files_changed_score = 0
     num_changed = 0
@@ -69,6 +84,7 @@ if __name__ == "__main__":
         quit()
     parser = argparse.ArgumentParser(description="Lists potentially spam prs in github")
     parser.add_argument("--repo", "-r", required=True)
+    parser.add_argument("--use-user-stats", "-u", action="store_true")
     parser.add_argument("--dry-run", "-d", action="store_true")
     opts = parser.parse_args()
     repo = opts.repo
@@ -86,7 +102,7 @@ if __name__ == "__main__":
     spam_prs = []
     for pr in prs:
         if pr.created_at > datetime(year=2020, month=9, day=30):
-            spam_data = is_spam(pr)
+            spam_data = is_spam(pr, include_user_stats=opts.use_user_stats)
             if spam_data:
                 spam_prs.append(pr)
 
