@@ -69,7 +69,9 @@ if __name__ == "__main__":
         quit()
     parser = argparse.ArgumentParser(description="Lists potentially spam prs in github")
     parser.add_argument("--repo", "-r", required=True)
-    repo = parser.parse_args().repo
+    parser.add_argument("--dry-run", "-d", action="store_true")
+    opts = parser.parse_args()
+    repo = opts.repo
     g = Github(personal_token)
     try:
         repo = g.get_repo(repo)
@@ -105,19 +107,20 @@ if __name__ == "__main__":
         # Create a spam label with poop color
         spam_label = repo.create_label(name="spam", color="7a5901", description="Spam")
 
-    resp = input("Mark all as spam and close? [Y]es, [N]o, [O]ne at a time\n")
-    if resp.strip().lower() == "y":
-        print("Working...")
-        for pr in spam_prs:
-            pr.set_labels(spam_label)
-            pr.edit(state="closed")
-    elif resp.strip().lower() == "n":
-        print("Aborting")
-    elif resp.strip().lower() == "o":
-        for pr in spam_prs:
-            print(f"{bcolors.WARNING}PR #{pr.number}:\n{pr.title}\n{pr.url}{bcolors.ENDC}\n{spam_data}\n")
-            resp = input("Mark this as spam and close? [y/N]")
-            if resp.strip().lower() == "y":
+    if not opts.dry_run:
+        resp = input("Mark all as spam and close? [Y]es, [N]o, [O]ne at a time\n")
+        if resp.strip().lower() == "y":
+            print("Working...")
+            for pr in spam_prs:
                 pr.set_labels(spam_label)
                 pr.edit(state="closed")
-    print(f"{bcolors.OKGREEN}Done!{bcolors.ENDC}")
+        elif resp.strip().lower() == "n":
+            print("Aborting")
+        elif resp.strip().lower() == "o":
+            for pr in spam_prs:
+                print(f"{bcolors.WARNING}PR #{pr.number}:\n{pr.title}\n{pr.url}{bcolors.ENDC}\n{spam_data}\n")
+                resp = input("Mark this as spam and close? [y/N]")
+                if resp.strip().lower() == "y":
+                    pr.set_labels(spam_label)
+                    pr.edit(state="closed")
+        print(f"{bcolors.OKGREEN}Done!{bcolors.ENDC}")
