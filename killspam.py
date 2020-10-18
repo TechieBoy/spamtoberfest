@@ -86,7 +86,7 @@ if __name__ == "__main__":
         if pr.created_at > datetime(year=2020, month=9, day=30):
             spam_data = is_spam(pr)
             if spam_data:
-                spam_prs.append((pr, "" if spam_data is True else spam_data))
+                spam_prs.append((pr, spam_data))
 
     if len(spam_prs) > 0:
         print(f"{bcolors.HEADER}Found a total of {len(spam_prs)} potentially spam PR's!{bcolors.ENDC}")
