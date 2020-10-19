@@ -104,7 +104,7 @@ if __name__ == "__main__":
         if pr.created_at > datetime(year=2020, month=9, day=30):
             spam_data = is_spam(pr, include_user_stats=opts.use_user_stats)
             if spam_data:
-                spam_prs.append(pr)
+                spam_prs.append((pr, spam_data))
 
     if len(spam_prs) > 0:
         print(f"{bcolors.HEADER}Found a total of {len(spam_prs)} potentially spam PR's!{bcolors.ENDC}")
@@ -112,7 +112,7 @@ if __name__ == "__main__":
     else:
         print("No spam PR's found! If this is a incorrect, please help improve the crude spam detection!")
         quit()
-    for pr in spam_prs:
+    for (pr, spam_data) in spam_prs:
         print(f"\n{bcolors.WARNING}#{pr.number}:{pr.title}{bcolors.ENDC}\n{spam_data}")
         print("----------------------------------------------------")
 
@@ -127,13 +127,13 @@ if __name__ == "__main__":
         resp = input("Mark all as spam and close? [Y]es, [N]o, [O]ne at a time\n")
         if resp.strip().lower() == "y":
             print("Working...")
-            for pr in spam_prs:
+            for (pr, _) in spam_prs:
                 pr.set_labels(spam_label)
                 pr.edit(state="closed")
         elif resp.strip().lower() == "n":
             print("Aborting")
         elif resp.strip().lower() == "o":
-            for pr in spam_prs:
+            for (pr, spam_data) in spam_prs:
                 print(f"{bcolors.WARNING}PR #{pr.number}:\n{pr.title}\n{pr.url}{bcolors.ENDC}\n{spam_data}\n")
                 resp = input("Mark this as spam and close? [y/N]")
                 if resp.strip().lower() == "y":
